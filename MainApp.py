@@ -1,4 +1,5 @@
 import copy
+import datetime
 import time
 import typing
 
@@ -42,7 +43,7 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
         try:
             self.out_data = copy.deepcopy(self.table_data)
 
-            start_time = time.time()
+            start_time = datetime.datetime.now()
             key = self.key_select.currentText().strip()
             print(key)
             if key == "ID":
@@ -52,8 +53,8 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
             elif key == "Age":
                 sravn, perest = quicksort_age(self.out_data, 0, len(self.out_data) - 1)
 
-            end_time = time.time() - start_time
-            self.set_ex_time(str(end_time))
+            end_time = datetime.datetime.now() - start_time
+            self.set_ex_time(str(end_time.total_seconds() * 1000))
             self.set_ex_perest(str(perest))
             self.set_ex_srav(str(sravn))
             self.print_out_table()
@@ -65,7 +66,7 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
         self.label_6.setText("Количество перестановок: " + src)
 
     def set_ex_time(self, src):
-        self.label_7.setText("Время: " + src + "s")
+        self.label_7.setText("Время: " + src + "ms")
 
     def set_ex_srav(self, src):
         self.label_8.setText("Количество сравнений: " + src)
