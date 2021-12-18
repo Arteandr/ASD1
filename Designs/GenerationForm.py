@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(361, 181)
+        Form.resize(361, 122)
         self.first_btn = QtWidgets.QPushButton(Form)
         self.first_btn.setGeometry(QtCore.QRect(20, 70, 101, 41))
         self.first_btn.setObjectName("first_btn")
@@ -31,9 +31,6 @@ class Ui_Form(object):
         font.setPointSize(18)
         self.label.setFont(font)
         self.label.setObjectName("label")
-        self.big_btn = QtWidgets.QPushButton(Form)
-        self.big_btn.setGeometry(QtCore.QRect(20, 120, 321, 41))
-        self.big_btn.setObjectName("big_btn")
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -45,4 +42,3 @@ class Ui_Form(object):
         self.second_btn.setText(_translate("Form", "1000"))
         self.third_btn.setText(_translate("Form", "5000"))
         self.label.setText(_translate("Form", "<html><head/><body><p align=\"center\">Сгенерировать</p></body></html>"))
-        self.big_btn.setText(_translate("Form", "10000"))

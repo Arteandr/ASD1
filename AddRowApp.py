@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets
 import Designs.AddRowForm as ar
-from Row import Row
 
 
 class AddRowApp(QtWidgets.QMainWindow, ar.Ui_AddRowWindow):
@@ -38,14 +37,13 @@ class AddRowApp(QtWidgets.QMainWindow, ar.Ui_AddRowWindow):
             self.main.src_table.setItem(row, 2, QtWidgets.QTableWidgetItem(self.age_input.toPlainText().strip()))
 
             self.main.table_data.append(
-                Row(
+                [
                     int(self.id_input.toPlainText().strip()),
-                    str(self.name_input.toPlainText().strip()),
-                    int(self.age_input.toPlainText().strip()),
-                )
+                    self.name_input.toPlainText().strip(),
+                    int(self.age_input.toPlainText().strip())
+                ]
             )
 
-            print(self.main.table_data[len(self.main.table_data) - 1].name, self.main.table_data[len(self.main.table_data) - 1].id, self.main.table_data[len(self.main.table_data) - 1].age)
         except Exception as e:
             print(e)
 

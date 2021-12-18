@@ -1,14 +1,15 @@
 import copy
+import csv
 import datetime
-import time
-import typing
+import os
+import sys
 
 from PyQt5 import QtWidgets
 import Designs.MainForm as mf
 
 from AddRowApp import AddRowApp
 from GenerationApp import GenerationApp
-from Sort import quicksort, quicksort_name, quicksort_age
+from Sort import quicksort
 
 
 class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
@@ -27,6 +28,21 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
         self.gen_btn.clicked.connect(self.generate_btn_onclick)
         self.sort_btn.clicked.connect(self.sort_btn_onclick)
 
+        self.load_file_btn.clicked.connect(self.load_file_btn_onclick)
+
+    def load_file_btn_onclick(self):
+        self.table_data = list()
+
+        fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open file", filter="CSV files (*.csv)")
+
+        with open(fname[0], newline="", encoding="UTF-8") as f:
+            reader = csv.reader(f)
+
+            self.table_data = [
+                [int(line[0]), line[1], int(line[2])] for line in reader if line
+            ]
+        self.print_src_table()
+
     def sort_btn_onclick(self):
         try:
             selected_text = self.method_select.currentText().strip()
@@ -42,16 +58,14 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
             return
         try:
             self.out_data = copy.deepcopy(self.table_data)
-
             start_time = datetime.datetime.now()
             key = self.key_select.currentText().strip()
-            print(key)
             if key == "ID":
-                sravn, perest = quicksort(self.out_data, 0, len(self.out_data) - 1)
-            elif key == "Name":
-                sravn, perest = quicksort_name(self.out_data, 0, len(self.out_data) - 1)
+                perest, sravn = quicksort(self.out_data, 0, len(self.out_data) - 1, 0)
+            if key == "Name":
+                perest, sravn = quicksort(self.out_data, 0, len(self.out_data) - 1, 1)
             elif key == "Age":
-                sravn, perest = quicksort_age(self.out_data, 0, len(self.out_data) - 1)
+                perest, sravn = quicksort(self.out_data, 0, len(self.out_data) - 1, 2)
 
             end_time = datetime.datetime.now() - start_time
             self.set_ex_time(str(end_time.total_seconds() * 1000))
@@ -60,7 +74,9 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
             self.print_out_table()
 
         except Exception as e:
-            print(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno, e)
 
     def set_ex_perest(self, src):
         self.label_6.setText("Количество перестановок: " + src)
@@ -94,9 +110,9 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
                 row_count = self.src_table.rowCount()
                 self.src_table.insertRow(row_count)
 
-                self.src_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(row.id)))
-                self.src_table.setItem(row_count, 1, QtWidgets.QTableWidgetItem(row.name))
-                self.src_table.setItem(row_count, 2, QtWidgets.QTableWidgetItem(str(row.age)))
+                self.src_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(row[0])))
+                self.src_table.setItem(row_count, 1, QtWidgets.QTableWidgetItem(str(row[1])))
+                self.src_table.setItem(row_count, 2, QtWidgets.QTableWidgetItem(str(row[2])))
             except Exception as e:
                 print(e)
 
@@ -108,9 +124,9 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
                 row_count = self.out_table.rowCount()
                 self.out_table.insertRow(row_count)
 
-                self.out_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(row.id)))
-                self.out_table.setItem(row_count, 1, QtWidgets.QTableWidgetItem(str(row.name)))
-                self.out_table.setItem(row_count, 2, QtWidgets.QTableWidgetItem(str(row.age)))
+                self.out_table.setItem(row_count, 0, QtWidgets.QTableWidgetItem(str(row[0])))
+                self.out_table.setItem(row_count, 1, QtWidgets.QTableWidgetItem(str(row[1])))
+                self.out_table.setItem(row_count, 2, QtWidgets.QTableWidgetItem(str(row[2])))
             except Exception as e:
                 print(e)
 
@@ -120,7 +136,7 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
         state = False
 
         for item in self.table_data:
-            if int(item.id) == id:
+            if int(item[0]) == id:
                 state = True
                 break
 

@@ -2,7 +2,6 @@ import random
 
 from PyQt5 import QtWidgets
 import Designs.GenerationForm as gf
-from Row import Row
 
 
 class GenerationApp(QtWidgets.QMainWindow, gf.Ui_Form):
@@ -12,7 +11,6 @@ class GenerationApp(QtWidgets.QMainWindow, gf.Ui_Form):
 
         self.main = main
 
-        self.big_btn.clicked.connect(lambda: self.generate(10000))
         self.first_btn.clicked.connect(lambda: self.generate(500))
         self.second_btn.clicked.connect(lambda: self.generate(1000))
         self.third_btn.clicked.connect(lambda: self.generate(5000))
@@ -23,11 +21,11 @@ class GenerationApp(QtWidgets.QMainWindow, gf.Ui_Form):
         for i in range(count):
             try:
                 self.main.table_data.append(
-                    Row(
+                    [
                         self.id_generate(),
                         self.name_generate(),
                         self.age_generate()
-                    )
+                    ]
                 )
             except Exception as e:
                 print(e)
