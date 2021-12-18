@@ -10,6 +10,7 @@ import Designs.MainForm as mf
 from AddRowApp import AddRowApp
 from GenerationApp import GenerationApp
 from Sort import quicksort
+from StepApp import StepApp
 
 
 class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
@@ -23,25 +24,34 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
 
         self.add_row_form = AddRowApp(self)
         self.generation_form = GenerationApp(self)
+        self.step_form = StepApp(self)
 
         self.add_btn.clicked.connect(self.add_btn_onclick)
         self.gen_btn.clicked.connect(self.generate_btn_onclick)
         self.sort_btn.clicked.connect(self.sort_btn_onclick)
 
         self.load_file_btn.clicked.connect(self.load_file_btn_onclick)
+        self.show_step_btn.clicked.connect(self.show_step_btn_onclick)
+
+    def show_step_btn_onclick(self):
+        if len(self.step_form.steps) <= 0: return
+        self.step_form.show()
 
     def load_file_btn_onclick(self):
         self.table_data = list()
 
         fname = QtWidgets.QFileDialog.getOpenFileName(self, "Open file", filter="CSV files (*.csv)")
+        if len(fname[0]) <= 0: return
+        try:
+            with open(fname[0], newline="", encoding="UTF-8") as f:
+                reader = csv.reader(f)
 
-        with open(fname[0], newline="", encoding="UTF-8") as f:
-            reader = csv.reader(f)
-
-            self.table_data = [
-                [int(line[0]), line[1], int(line[2])] for line in reader if line
-            ]
-        self.print_src_table()
+                self.table_data = [
+                    [int(line[0]), line[1], int(line[2])] for line in reader if line
+                ]
+            self.print_src_table()
+        except Exception as e:
+            print(e)
 
     def sort_btn_onclick(self):
         try:
@@ -61,12 +71,14 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
             start_time = datetime.datetime.now()
             key = self.key_select.currentText().strip()
             if key == "ID":
-                perest, sravn = quicksort(self.out_data, 0, len(self.out_data) - 1, 0)
+                perest, sravn, steps = quicksort(self.out_data, 0, len(self.out_data) - 1, 0)
             if key == "Name":
-                perest, sravn = quicksort(self.out_data, 0, len(self.out_data) - 1, 1)
+                perest, sravn, steps = quicksort(self.out_data, 0, len(self.out_data) - 1, 1)
             elif key == "Age":
-                perest, sravn = quicksort(self.out_data, 0, len(self.out_data) - 1, 2)
-
+                perest, sravn, steps = quicksort(self.out_data, 0, len(self.out_data) - 1, 2)
+            print("steps", len(steps))
+            self.step_form.steps = steps
+            self.step_form.print()
             end_time = datetime.datetime.now() - start_time
             self.set_ex_time(str(end_time.total_seconds() * 1000))
             self.set_ex_perest(str(perest))
