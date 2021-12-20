@@ -9,7 +9,7 @@ import Designs.MainForm as mf
 
 from AddRowApp import AddRowApp
 from GenerationApp import GenerationApp
-from Sort import quicksort
+from Sort import quicksort, vst
 from StepApp import StepApp
 
 
@@ -55,6 +55,8 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
 
     def sort_btn_onclick(self):
         try:
+            self.step_form.current_step = 0
+            self.step_form.steps = list()
             selected_text = self.method_select.currentText().strip()
             if selected_text == "Быстрая сортировка":
                 self.quicksort_emit()
@@ -76,15 +78,41 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
                 perest, sravn, steps = quicksort(self.out_data, 0, len(self.out_data) - 1, 1)
             elif key == "Age":
                 perest, sravn, steps = quicksort(self.out_data, 0, len(self.out_data) - 1, 2)
-            print("steps", len(steps))
+
+            end_time = datetime.datetime.now() - start_time
             self.step_form.steps = steps
             self.step_form.print()
-            end_time = datetime.datetime.now() - start_time
             self.set_ex_time(str(end_time.total_seconds() * 1000))
             self.set_ex_perest(str(perest))
             self.set_ex_srav(str(sravn))
             self.print_out_table()
 
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno, e)
+
+    def inclusionsort_emit(self):
+        if len(self.table_data) < 2:
+            return
+        try:
+            self.out_data = copy.deepcopy(self.table_data)
+            start_time = datetime.datetime.now()
+            key = self.key_select.currentText().strip()
+            if key == "ID":
+                perest, sravn, steps = vst(self.out_data, len(self.out_data), 0)
+            if key == "Name":
+                perest, sravn, steps = vst(self.out_data, len(self.out_data), 1)
+            elif key == "Age":
+                perest, sravn, steps = vst(self.out_data, 0, len(self.out_data), 2)
+
+            end_time = datetime.datetime.now() - start_time
+            self.step_form.steps = steps
+            self.step_form.print()
+            self.set_ex_time(str(end_time.total_seconds() * 1000))
+            self.set_ex_perest(str(perest))
+            self.set_ex_srav(str(sravn))
+            self.print_out_table()
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -98,9 +126,6 @@ class MainApp(QtWidgets.QMainWindow, mf.Ui_MainWindow):
 
     def set_ex_srav(self, src):
         self.label_8.setText("Количество сравнений: " + src)
-
-    def inclusionsort_emit(self):
-        self.print_out_table()
 
     def add_btn_onclick(self):
         self.add_row_form.show()
